@@ -1,6 +1,7 @@
 package com.example.ioccontainer;
 
 import org.springframework.beans.factory.annotation.Autowired;
+
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -30,14 +31,16 @@ public class MyIocContainer {
     // 从 IoC 容器中获取一个 bean
     // 实质是工厂模式
     public Object getBean(String beanName) {
-        if (beans.get(beanName) != null)
-            return beans.get(beanName);
+        String fullBeanName = (String) properties.get(beanName);
+        if (beans.get(fullBeanName) != null)
+            return beans.get(fullBeanName);
 
         try {
             Class<?> aClass = Class.forName(properties.getProperty(beanName));
             Object beanInstance = aClass.getConstructor().newInstance();
             // DI
             dependencyInject(aClass, beanInstance);
+            beans.put(fullBeanName,beanInstance);
             return beanInstance;
         } catch (Exception e) {
             throw new RuntimeException(e);
